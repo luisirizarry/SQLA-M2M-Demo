@@ -38,8 +38,37 @@ class Employee(db.Model):
     # SQLA will populate it with data from the departments table automatically!
     dept = db.relationship('Department', backref='employees')
 
+    assignments = db.relationship('EmployeeProject', backref='employee')
+
     def __repr__(self):
         return f"<Employee {self.name} {self.state} {self.dept_code} >"
+    
+class Project(db.Model):
+    """Project Model"""
+
+    __tablename__ = "projects"
+
+    proj_code = db.Column(db.Text, primary_key=True)
+    proj_name = db.Column(db.Text, nullable=False, unique=True)
+
+    assignments = db.relationship('EmployeeProject', backref='project')
+
+    def __repr__(self):
+        return f"<Project {self.proj_code} {self.proj_name} >"
+
+class EmployeeProject(db.Model):
+    """EmployeeProject Model"""
+
+    __tablename__ = "employee_projects"
+
+    emp_id = db.Column(db.Integer, db.ForeignKey('employees.id'), primary_key=True)
+    proj_code = db.Column(db.Text, db.ForeignKey('projects.proj_code'), primary_key=True)
+    role = db.Column(db.Text)
+
+    def __repr__(self):
+        return f"<EmployeeProject {self.emp_id} {self.proj_code} {self.role} >"
+    
+
 
 
 def get_directory():
@@ -50,3 +79,23 @@ def get_directory():
             print(emp.name, emp.dept.dept_name, emp.dept.phone)
         else:
             print(emp.name)
+
+def get_directory_join():
+    directory = db.session.query(Employee.name, Department.dept_name, Department.phone).join(Department).all()
+
+    for name, dept, phone in directory:
+        print(name, dept, phone)
+
+def get_directory_join_class():
+    directory = db.session.query(Employee, Department).join(Department).all()
+
+    for emp, dept in directory:
+        print(emp.name, dept.dept_name, dept.phone)
+
+def get_directory_all_join():
+    directory = db.session.query(Employee, Department).outerjoin(Department).all()
+
+    for emp, dept in directory:
+        print(emp.name, dept.dept_name, dept.phone)
+
+
