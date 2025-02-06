@@ -38,7 +38,8 @@ class Employee(db.Model):
     # SQLA will populate it with data from the departments table automatically!
     dept = db.relationship('Department', backref='employees')
 
-    assignments = db.relationship('EmployeeProject', backref='employee')
+    # assignments = db.relationship('EmployeeProject', backref='employee')
+    projects = db.relationship('Project', secondary='employee_projects', backref='employees')
 
     def __repr__(self):
         return f"<Employee {self.name} {self.state} {self.dept_code} >"
@@ -51,7 +52,7 @@ class Project(db.Model):
     proj_code = db.Column(db.Text, primary_key=True)
     proj_name = db.Column(db.Text, nullable=False, unique=True)
 
-    assignments = db.relationship('EmployeeProject', backref='project')
+    # assignments = db.relationship('EmployeeProject', backref='project')
 
     def __repr__(self):
         return f"<Project {self.proj_code} {self.proj_name} >"
